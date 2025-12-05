@@ -1,0 +1,158 @@
+openapi: 3.0.0
+info:
+  title: API для получения информации о действующих вкладах (депозитах) авторизованного пользователя
+  version: 1.0.0
+  description: API для получения информации о действующих вкладах (депозитах) пользователя
+paths:
+  /api/v1/deposit-service/deposits:
+    get:
+      summary: Получение списка действующих вкладов(депозитов) авторизованного пользователя
+      tags:
+      - deposit-controller-impl
+      parameters:
+        - name: authorization
+          in: header
+          required: true
+          description: "Bearer JWT токен для авторизации"
+          schema:
+            type: string
+            example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+             schema:
+              type: object
+              required:
+                - depositId
+                - createdAt
+                - currentBalance
+                - depositProductName
+                - interestPercent
+                - revocable
+                - status
+                - depositAccountNumber
+                - baseSum
+                - percentSum
+                - currency
+                - capitalization
+                - compressibility
+                - termMonth
+              properties:
+               createdAt:
+                type: string
+                format: date-time
+                example: "2024-01-15T14:30:00Z"
+               currentBalance:
+                type: number
+                format: float
+                description: Баланс депозитного счета
+                example: "1150.50"
+               depositProductName:
+                type: string
+                description: Наименование депозитного продукта
+                example: "Выгодный"
+               interestPercent: 
+                type: number
+                format: float
+                description: Процентная ставка
+                example: "20.5"
+               revocable:
+                type: boolean
+                description: Возможность частичного снятия средств
+                example: "TRUE"
+               status:
+                type: string
+                description: Статус депозита (состояние счета)
+                example: "ACTIVE"
+                enum:
+                  - ACTIVE
+                  - CLOSED
+                  - BLOCKED
+               depositAccountNumber:
+                type: number
+                description: Номер депозитного счёта
+                example: "40817810000000014321"
+               baseSum:
+                type: number
+                format: float
+                description: Изначальная сумма депозита
+                example: "2200.90"
+               percentSum:
+                type: number
+                format: float
+                description: Сумма начисленного процента
+                example: 200.90
+               currency:
+                type: string
+                description: Валюта депозита
+                example: "RUB"
+                enum:
+                  - RUB
+                  - USD
+                  - EUR
+                  - BYN
+                  - CNY
+                  - KZT
+               capitalization:
+                type: string
+                description: Вид капитализации
+                example: "Ежемесячная"
+                enum:
+                  - Ежемесячная
+                  - При истечении срока возврата вклада
+               compressibility:
+                type: boolean
+                description: Возможность снять депозит раньше срока и получить несгораемый процент
+                example: false
+               termMonth:
+                type: number
+                description: Срок размещения вклада в месяцах
+                example: 12
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  uri:
+                    type: string
+                    example: "deposit-service/deposits"
+                  type:
+                    type: string
+                    example: "BadRequestException"
+                  message:
+                    type: array
+                    items: 
+                     type: string
+                    example: "The request is invalid"
+                  timestamp:
+                   type: string
+                   example: "2024-01-15T14:30:00Z"
+                required:
+                  - type
+                  - message
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  uri:
+                    type: string
+                    example: "deposit-service/deposits/{depositId}"
+                  type:
+                    type: string
+                    example: "UnauthorizedException"
+                  message:
+                    type: string
+                    example: "Unauthorized access"
+                  timestamp:
+                    type: string
+                    example: "2024-11-28T13:15:09Z"
+                required:
+                  - type
+                  - message
