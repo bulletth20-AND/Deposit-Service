@@ -11,7 +11,7 @@ autonumber
 
 front -> api ++ : GET /api/v1/deposit-service/deposits
 activate front
-api -> api: Проверка валидности JWT ffff+++
+api -> api: Проверка валидности JWT ffff
 
 group #pink JWT невалиден
 api --> front: HTTP 401 Unauthorized + JSON
