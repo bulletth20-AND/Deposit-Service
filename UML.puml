@@ -1,0 +1,43 @@
+@startuml
+
+title Получение перечня действующих вкладов (депозитов) авторизованного пользователя
+
+boundary "Frontend" as front
+control "API Gateway" as api
+participant "Deposit Service" as deposit
+database "Deposit DB" as db
+
+autonumber
+
+front -> api ++ : GET /api/v1/deposit-service/deposits
+activate front
+api -> api: Проверка валидности JWT
+
+group #pink JWT невалиден
+api --> front: HTTP 401 Unauthorized + JSON
+end
+
+api -> deposit ++ : GET /deposit-service/deposits
+deposit -> deposit : Проверка  корректности запроса
+
+group #Pink Неверные параметры запроса 
+deposit --> api:  400 Bad Request + JSON 
+api --> front:  400 Bad Request + JSON 
+end
+
+deposit -> deposit: Извлекает userId из JWT
+deposit -> db++: SQL-запрос на получение списка (SELECT) 
+db --> deposit--: Результат запроса
+
+
+group Депозиты не найдены
+deposit --> api:  200 OK + пустой массив
+api --> front:  200 OK + пустой массив
+end
+group Депозиты найдены
+deposit --> api --:  200 OK + JSON
+api --> front --:  200 OK + JSON
+deactivate front
+end
+
+@enduml
